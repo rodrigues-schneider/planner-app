@@ -1,10 +1,10 @@
-import { View, Text } from "react-native";
-import { TodayTasks, Header, CustonButton } from "../components/";
+import { TaskPlacer, Header, CustonButton } from "../components/";
 
-import { Background } from "../constants/styled";
+import { Background } from "../themes/styled";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { NativeStackParamList } from "../routes/project.routes";
+import { DataHandler } from "../services";
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<
   NativeStackParamList,
@@ -20,7 +20,7 @@ export default function HomeScreen() {
   return (
     <Background>
       <Header title="Tarefas de hoje" />
-      <TodayTasks />
+      <TaskPlacer selectedDate={DataHandler.formatedToday()} />
       <CustonButton
         text="Nova Tarefa"
         icon="plus"

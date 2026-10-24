@@ -5,7 +5,8 @@ react-navigation
 react-native-safe-area-context
 styled-components
 react-native-calendars
-react-native-picker/picker
 react-native-element-dropdown
+toastify-react-native
 
 
+0

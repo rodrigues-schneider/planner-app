@@ -1,32 +1,33 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Dropdown } from "react-native-element-dropdown";
-import { fonts, colors } from "../constants/";
+import { fonts, colors } from "../themes";
 
 type CustonPickerProps = {
-  labelArray: string[];
-  valueArray?: string[];
+  dropdownItemListData: string[];
+  dropdownValueListData?: string[];
   label?: string;
   value?: string;
-  onChange?: (value: string) => void;
+  onChange?: (item: string) => void | undefined;
 };
 
 export default function CustonDropdownComponent({
-  labelArray,
-  valueArray,
+  dropdownItemListData: labelArray,
+  dropdownValueListData: valueArray,
   label,
   value,
   onChange,
 }: CustonPickerProps) {
   const [focused, setFocused] = useState(false);
 
-  let data: string[] = [];
+  let data: any[] = [];
 
   labelArray.forEach((item, index) => {
     const row = {
       label: item,
       value: valueArray?.[index] ?? item,
     };
+    data.push(row);
   });
 
   return (

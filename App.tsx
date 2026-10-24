@@ -2,10 +2,11 @@ import { StatusBar } from "expo-status-bar";
 import { View, ActivityIndicator } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useFonts } from "expo-font";
-import { fonts, colors } from "./src/constants/themes";
+import { fonts, colors } from "./src/themes/themes";
 import { usePlannerData, PlannerContextProvider } from "./src/contexts";
 
 import { Routes } from "./src/routes/";
+import ToastManager from "toastify-react-native";
 
 function AppContent() {
   //Carrega as Fontes
@@ -30,6 +31,7 @@ function AppContent() {
     <SafeAreaProvider>
       <StatusBar style="auto" />
       <Routes />
+      <ToastManager />
     </SafeAreaProvider>
   );
 }

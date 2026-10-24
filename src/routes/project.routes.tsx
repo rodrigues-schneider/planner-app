@@ -7,7 +7,7 @@ import { HomeScreen, CalendarScreen, RegisterScreen } from "../screens";
 import FontAwesome, {
   FontAwesomeIconName,
 } from "@react-native-vector-icons/fontawesome";
-import { colors } from "../constants/";
+import { colors } from "../themes";
 import { View, Text } from "react-native";
 
 export type BottomTabParamList = {

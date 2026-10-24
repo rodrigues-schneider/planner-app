@@ -6,14 +6,16 @@ import {
   Text,
   TextInputProps,
 } from "react-native";
-import { fonts, colors } from "../constants/themes";
+import { fonts, colors } from "../themes/themes";
 
 type CustonInputProp = TextInputProps & {
-  label: string;
+  label?: string;
 };
 
-export default function CustonInput({ label }: CustonInputProp) {
-  const [text, setText] = useState("");
+export default function CustonInput({
+  label,
+  ...textInputProps
+}: CustonInputProp) {
   const [focused, setFocused] = useState(false);
 
   return (
@@ -26,9 +28,8 @@ export default function CustonInput({ label }: CustonInputProp) {
         ]}
       >
         <TextInput
+          {...textInputProps}
           style={styles.textInput}
-          onChangeText={(value) => setText(value)}
-          value={text}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
         />

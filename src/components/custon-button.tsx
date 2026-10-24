@@ -4,7 +4,7 @@ import {
   TouchableOpacity,
   TouchableOpacityProps,
 } from "react-native";
-import { fonts, colors } from "../constants/themes";
+import { fonts, colors } from "../themes/themes";
 import {
   FontAwesomeIconName,
   FontAwesome,
@@ -14,6 +14,7 @@ type CustonButtonProps = TouchableOpacityProps & {
   text: string;
   textColor?: string;
   icon?: FontAwesomeIconName;
+  isDisabled?: boolean;
 };
 
 export default function CustonButton({
@@ -21,11 +22,28 @@ export default function CustonButton({
   textColor,
   icon,
   onPress,
+  isDisabled,
+  ...touchableOpacityProps
 }: CustonButtonProps) {
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress}>
-      {icon && <FontAwesome name={icon} style={styles.icon} />}
-      <Text style={[styles.text, { color: textColor }]}>{text}</Text>
+    <TouchableOpacity
+      {...touchableOpacityProps}
+      style={[
+        styles.container,
+        isDisabled && { backgroundColor: colors.Accent },
+      ]}
+      onPress={onPress}
+      disabled={isDisabled}
+    >
+      {icon && (
+        <FontAwesome
+          name={icon}
+          style={[styles.icon, isDisabled && { color: colors.Muted }]}
+        />
+      )}
+      <Text style={[styles.text, isDisabled && { color: colors.Muted }]}>
+        {text}
+      </Text>
     </TouchableOpacity>
   );
 }
@@ -36,7 +54,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 10,
-    width: 350,
+    width: "85%",
     height: 50,
     backgroundColor: colors.Primary,
     borderRadius: 10,
@@ -48,7 +66,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 20,
     fontFamily: fonts.MEDIUM,
-    color: colors.Background,
+    color: colors.Muted,
   },
 
   icon: {

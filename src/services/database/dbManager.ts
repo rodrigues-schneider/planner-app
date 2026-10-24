@@ -1,6 +1,7 @@
 import * as SQLite from "expo-sqlite";
-import { PlannerTask, TaskCategory, Place } from "../";
+import { PlannerTask, TaskCategory, Place, CreatePlannerTaskDTO } from "../";
 import { FontAwesomeIconName } from "@react-native-vector-icons/fontawesome";
+import { colors } from "../../themes";
 
 export class DbManager {
   private static instance: DbManager | null = null;
@@ -92,17 +93,22 @@ export class DbManager {
 
   //-----Setters----//
 
-  //Guarda uma nova task no DB
-  public async insertNewTask(name: string, date: string, hour: string) {
+  //Guarda uma nova task no DB, e retorna se houver sucesso
+  public async insertNewTask(task: CreatePlannerTaskDTO) {
     if (!this.db) throw new Error("Base de dados não inicializada.");
 
     const result = await this.db.runAsync(
-      `
-        INSERT INTO tasks (name, date, hour) VALUES (?, ?, ?);
-        `,
-      name,
-      date,
-      hour,
+      `INSERT INTO tasks (name, date, hour, category, description, place, completed)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [
+        task.name,
+        task.date,
+        task.hour,
+        task.category ?? null,
+        task.description ?? null,
+        task.place ?? null,
+        task.completed ? 1 : 0,
+      ],
     );
     await this.refreshLists();
 
@@ -110,15 +116,14 @@ export class DbManager {
   }
 
   //Adiciona uma categoria à uma Task e à tabela de categorias, se não existir nela
-  public async setCategory(
-    taskId: number,
+  public async insertNewCategory(
     newCategory: string,
     categoryColor?: string,
     categoryIcon?: FontAwesomeIconName,
   ) {
     if (!this.db) throw new Error("Base de dados não inicializada.");
 
-    const color = categoryColor ?? "#000000";
+    const color = categoryColor ?? colors.Foreground;
 
     await this.db.runAsync(
       `
@@ -129,13 +134,6 @@ export class DbManager {
       categoryIcon ?? null,
     );
 
-    await this.db.runAsync(
-      `
-        UPDATE tasks SET category = ? WHERE id = ?;
-        `,
-      newCategory,
-      taskId,
-    );
     await this.refreshLists();
   }
 
@@ -183,7 +181,20 @@ export class DbManager {
   }
 
   //Adiciona ou atualiza a descrição de uma Task
-  public async setDescription(taskId: number, description: string) {
+  public async setTaskCategory(taskId: number, newCategory: string) {
+    if (!this.db) throw new Error("Base de dados não inicializada.");
+
+    await this.db.runAsync(
+      `
+        UPDATE tasks SET category = ? WHERE id = ?;
+        `,
+      newCategory,
+      taskId,
+    );
+    await this.refreshLists();
+  }
+
+  public async setTaskDescription(taskId: number, description: string) {
     if (!this.db) throw new Error("Base de dados não inicializada.");
 
     await this.db.runAsync(
@@ -197,7 +208,7 @@ export class DbManager {
   }
 
   //Associa um local a uma Task
-  public async setPlace(taskId: number, place: string) {
+  public async setTaskPlace(taskId: number, place: string) {
     if (!this.db) throw new Error("Base de dados não inicializada.");
 
     await this.db.runAsync(

@@ -1,15 +1,26 @@
-import { View, Text } from "react-native";
-import React from "react";
-import { Calendar } from "react-native-calendars";
-import { Header } from "../components";
-import { Background } from "../constants";
+import { Text } from "react-native";
+import { useState } from "react";
+
+import { CustonCalendar, Header, TaskPlacer } from "../components";
+import { Background } from "../themes";
+import { DataHandler } from "../services";
 
 export default function CalendarScreen() {
+  const today = DataHandler.formatedToday();
+
+  const [selectedDate, setSelectedDate] = useState<string>(today);
+
   return (
     <Background>
       <Header title="Calendário de tarefas" subtitle="Selecione uma data" />
-      <Calendar />
-      <Text>calendar-screen</Text>
+
+      <CustonCalendar
+        selectedDate={selectedDate}
+        onDayPress={(day) => setSelectedDate(day.dateString)}
+      />
+
+      <Text>Selecionada: {selectedDate}</Text>
+      <TaskPlacer selectedDate={selectedDate} />
     </Background>
   );
 }

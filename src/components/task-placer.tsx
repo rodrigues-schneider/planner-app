@@ -5,42 +5,19 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useState } from "react";
 
-import { colors, fonts } from "../constants/themes";
+import { useMemo, useState } from "react";
 
+import { colors, fonts } from "../themes/themes";
 import { usePlannerData } from "../contexts";
-import { TaskCategory, PlannerTask, today } from "../services";
-import { FontAwesome } from "@react-native-vector-icons/fontawesome";
+import { PlannerTask, DataHandler } from "../services";
+import TaskContainer from "./task-container";
 
-const TaskContainer = ({ task }: { task: PlannerTask }) => {
-  const { categories } = usePlannerData();
-
-  const category: TaskCategory | undefined = categories.find(
-    (c) => c.category_name === task.category,
-  );
-
-  return (
-    <View style={styles.taskContainer}>
-      <Text style={{ fontFamily: fonts.BOLD, color: colors.Foreground }}>
-        {task.name}
-      </Text>
-      <View style={{ flexDirection: "row" }}>
-        <Text style={{ fontFamily: fonts.LIGHT, color: colors.Secondary }}>
-          {task.hour}
-        </Text>
-        {category?.category_icon && (
-          <FontAwesome name={category?.category_icon} />
-        )}
-        <Text style={{ color: category?.category_color ?? "#000000" }}>
-          {category?.category_name}
-        </Text>
-      </View>
-    </View>
-  );
+type TaskPlacerProps = {
+  selectedDate: string;
 };
 
-export default function CategoryFilter() {
+export default function TaskPlacer({ selectedDate }: TaskPlacerProps) {
   const { categories, tasks } = usePlannerData();
 
   const categoryList: string[] = [
@@ -48,10 +25,13 @@ export default function CategoryFilter() {
     ...categories.map((c) => c.category_name),
   ];
 
-  const todayTasks = tasks.filter((task) => task.date === today());
-
   const [selectedFilter, setSelectedFilter] = useState("Todas");
-  const [showTasks, setShowTasks] = useState<PlannerTask[]>(todayTasks);
+
+  const filtredTasks = useMemo(() => {
+    return DataHandler.filterTaksByCategory(tasks, selectedFilter).filter(
+      (task) => task.date === selectedDate,
+    );
+  }, [tasks, selectedFilter, selectedDate]);
 
   return (
     <View style={{ flex: 1, paddingVertical: 10 }}>
@@ -86,9 +66,19 @@ export default function CategoryFilter() {
         showsVerticalScrollIndicator={false}
         style={{ padding: 10 }}
         contentContainerStyle={{ gap: 5 }}
-        data={showTasks}
-        keyExtractor={(item) => item.id?.toString() ?? item.name.toString()}
-        renderItem={({ item }) => <TaskContainer task={item} />}
+        data={filtredTasks}
+        keyExtractor={(item, index) =>
+          item.id?.toString() ?? `${item.name}-${index}`
+        }
+        renderItem={({ item }) => (
+          <TaskContainer
+            task={item}
+            onCheckPress={() => {
+              // Chamar aqui a função que atualiza
+              // a conclusão da tarefa no contexto/SQLite.
+            }}
+          />
+        )}
       />
     </View>
   );
@@ -98,10 +88,8 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: "center",
     alignItems: "center",
-
     height: 40,
     width: 100,
-
     borderRadius: 30,
     borderColor: colors.Secondary,
     borderWidth: 1,
@@ -110,10 +98,8 @@ const styles = StyleSheet.create({
   selectedContainer: {
     justifyContent: "center",
     alignItems: "center",
-
     height: 40,
     width: 80,
-
     borderRadius: 30,
     backgroundColor: colors.Secondary,
   },
